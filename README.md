@@ -23,10 +23,10 @@ Control your troll pack and gather as many resources as possible before the game
 - Used iterative testing with Claude to refine troll behavior (harvest).
 - Focused on the core gameplay loop: collect fruits → return to shack → repeat efficiently.
 - Added autonomous action selection for each troll:
-  -- Return to shack when carrying resources
-  -- Harvest when standing on a fruit tree
-  -- Move toward the nearest productive tree
-  -- Idle smartly when no fruit is available
+  → Return to shack when carrying resources
+  → Harvest when standing on a fruit tree
+  → Move toward the nearest productive tree
+  → Idle smartly when no fruit is available
   
 **League Wood 1 to League Bronze:**
 - Added economic expansion logic with adaptive troll training based on available resources and game progression.
@@ -48,9 +48,9 @@ Python 3.11
 - Iterated directly through the challenge arena and replay system
 **Testing:**
 - Verified troll state transitions:
-  -- moving
-  -- harvesting
-  -- returning resources
+  → moving
+  → harvesting
+  → returning resources
 - Observed replay behavior against opponents and adjusted targeting priorities
 **Validation:** 
 - Successfully climbed from Wood 2 to Wood 1 league
@@ -61,8 +61,8 @@ Python 3.11
 - Added planting and training logic incrementally
 **Testing:**
 - Verified troll state transitions:
-  -- planting
-  -- training new trolls
+  → planting
+  → training new trolls
 - Adjusted planting and expansion timing
 **Validation:**
 - Successfully climbed from Wood 1 to Bronze league
@@ -77,6 +77,7 @@ Python 3.11
 - **Single-turn reasoning**: No deep future planning to keep execution lightweight
 - **No pathfinding**: Relied on arena movement resolution instead of implementing BFS/A*
 - **Rapid iteration workflow**: Improvements validated directly through arena progression and replay analysis
+  
 **League Wood 1 to League Bronze:**
 - **Economic scaling over optimization**: Focused on increasing troll count and tree availability rather than perfect per-turn efficiency
 - **Heuristic planting strategy**: Triggered planting mode using simple thresholds instead of map-wide resource forecasting
