@@ -27,6 +27,7 @@ Control your troll pack and gather as many resources as possible before the game
   -- Harvest when standing on a fruit tree
   -- Move toward the nearest productive tree
   -- Idle smartly when no fruit is available
+  
 **League Wood 1 to League Bronze:**
 - Added economic expansion logic with adaptive troll training based on available resources and game progression.
 - Implemented early-game planting strategy to increase long-term fruit production before switching to full harvesting mode.
