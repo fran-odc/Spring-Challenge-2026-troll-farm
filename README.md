@@ -62,7 +62,7 @@ Python 3.11
 - **No pathfinding**: Relied on arena movement resolution instead of implementing BFS/A*
 - **Rapid iteration workflow**: Improvements validated directly through arena progression and replay analysis
 
-## 🏆 Competition Results
+<!-- ## 🏆 Competition Results -->
 
 <!-- 🥉 **Bronze League**: [Code Winner](code/1st-version-Bronze.md?plain=1) --> 
 
