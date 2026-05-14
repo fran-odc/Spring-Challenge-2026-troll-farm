@@ -23,9 +23,13 @@ Control your troll pack and gather as many resources as possible before the game
 - Used iterative testing with Claude to refine troll behavior (harvest).
 - Focused on the core gameplay loop: collect fruits → return to shack → repeat efficiently.
 - Added autonomous action selection for each troll:
+  
   → Return to shack when carrying resources
+  
   → Harvest when standing on a fruit tree
+
   → Move toward the nearest productive tree
+
   → Idle smartly when no fruit is available
   
 **League Wood 1 to League Bronze:**
@@ -42,28 +46,41 @@ Python 3.11
 ## 🚀 How to Run & Test
 
 **League Wood 2 to League Wood 1:**
+
 **Development workflow:**
 - Started from the official starter code
 - Added movement, harvesting, and drop logic incrementally
 - Iterated directly through the challenge arena and replay system
+  
 **Testing:**
 - Verified troll state transitions:
+
   → moving
+
   → harvesting
+
   → returning resources
+
 - Observed replay behavior against opponents and adjusted targeting priorities
+  
 **Validation:** 
 - Successfully climbed from Wood 2 to Wood 1 league
 - Confirmed stable autonomous gameplay without invalid commands or timeouts
 
 **League Wood 1 to League Bronze:**
+
 **Development workflow:**
 - Added planting and training logic incrementally
+  
 **Testing:**
 - Verified troll state transitions:
+
   → planting
+
   → training new trolls
+
 - Adjusted planting and expansion timing
+  
 **Validation:**
 - Successfully climbed from Wood 1 to Bronze league
 - Validated that early planting improved long-term resource generation in extended matches
