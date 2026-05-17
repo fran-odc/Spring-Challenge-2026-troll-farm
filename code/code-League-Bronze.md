@@ -1,4 +1,4 @@
-Code 298th (out of 552)
+Code 234th (out of 485)
 
 ```
 import sys
@@ -94,7 +94,7 @@ while True:
     actions = []
     num_trolls = len(my_trolls)
     
-    # ENTRAÎNEMENT
+    # ENTRAÎNEMENT ULTRA-AGRESSIF - La clé de la victoire !
     # Troll 2: Harvester (vitesse=2, capacité=3, récolte=2, coupe=0)
     if num_trolls == 1 and can_afford_training(my_inventory, num_trolls, 2, 3, 2, 0):
         actions.append("TRAIN 2 3 2 0")
@@ -144,7 +144,7 @@ while True:
             # Besoins troll 2 (2,3,2,0): 5 PLUM, 10 LEMON, 5 APPLE, 1 IRON
             # Besoins troll 3 (2,2,0,3): 8 PLUM, 8 LEMON, 2 APPLE, 13 IRON
             
-            # Phase 1: Obtenir fer
+            # Phase 1: Obtenir fer (priorité absolue!)
             if my_inventory[4] < 3 and iron_positions:
                 target = min(iron_positions, key=lambda p: manhattan_distance(troll['x'], troll['y'], p[0], p[1]))
                 if is_adjacent(troll['x'], troll['y'], target[0], target[1]):
@@ -196,13 +196,13 @@ while True:
                     actions.append("WAIT")
 
         # ═══════════════════════════════════════════════════════════
-        # CHOPPER - BOIS
+        # CHOPPER - BOIS = 4 POINTS !!! PRIORITÉ MAXIMALE
         # ═══════════════════════════════════════════════════════════
         elif role == 'chopper':
             # 1. Couper arbres taille 4 (4 bois = 16 points!)
             size4_trees = [t for t in trees if t['size'] == 4]
             if size4_trees:
-                # Priorité BANANA près eau
+                # Priorité BANANA près eau (repoussent vite)
                 banana_water = [t for t in size4_trees if t['type'] == 'BANANA' and is_near_water(t['x'], t['y'])]
                 target = min(banana_water if banana_water else size4_trees,
                            key=lambda t: manhattan_distance(troll['x'], troll['y'], t['x'], t['y']))
@@ -361,4 +361,4 @@ while True:
 
     print(';'.join(actions) if actions else "WAIT")
 ```
-```
+
