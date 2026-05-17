@@ -1,364 +1,153 @@
-Code 171th (out of 485)
+Code 165th (out of 485)
 
 ```
 import sys
 
-width, height = [int(i) for i in input().split()]
-grid = []
-my_shack = None
-opp_shack = None
-water_positions = []
-iron_positions = []
-
-for i in range(height):
-    line = input()
-    grid.append(line)
-    if '0' in line:
-        my_shack = (line.index('0'), i)
-    if '1' in line:
-        opp_shack = (line.index('1'), i)
-    for j, char in enumerate(line):
-        if char == '~':
-            water_positions.append((j, i))
-        elif char == '+':
-            iron_positions.append((j, i))
-
-def manhattan_distance(x1, y1, x2, y2):
-    return abs(x1 - x2) + abs(y1 - y2)
-
-def is_adjacent(x1, y1, x2, y2):
-    return manhattan_distance(x1, y1, x2, y2) == 1
-
-def is_near_water(x, y):
-    return any(abs(x - wx) + abs(y - wy) == 1 for wx, wy in water_positions)
-
-def can_afford_training(inventory, num_trolls, move, carry, harvest, chop):
-    costs = [
-        num_trolls + move * move,
-        num_trolls + carry * carry,
-        num_trolls + harvest * harvest,
-        num_trolls + chop * chop
-    ]
-    return all(inventory[i] >= costs[i] for i in range(4))
-
-turn = 0
-
-while True:
-    turn += 1
-    my_inventory = list(map(int, input().split()))
-    opp_inventory = list(map(int, input().split()))
-
-    trees = []
-    tree_positions = set()
-    trees_count = int(input())
-    for _ in range(trees_count):
-        inputs = input().split()
-        tree = {
-            'type': inputs[0],
-            'x': int(inputs[1]),
-            'y': int(inputs[2]),
-            'size': int(inputs[3]),
-            'health': int(inputs[4]),
-            'fruits': int(inputs[5]),
-            'cooldown': int(inputs[6])
-        }
-        trees.append(tree)
-        tree_positions.add((tree['x'], tree['y']))
-
-    my_trolls = []
-    opp_trolls = []
-    trolls_count = int(input())
-    for _ in range(trolls_count):
-        data = input().split()
-        troll = {
-            'id': int(data[0]),
-            'player': int(data[1]),
-            'x': int(data[2]),
-            'y': int(data[3]),
-            'movement_speed': int(data[4]),
-            'carry_capacity': int(data[5]),
-            'harvest_power': int(data[6]),
-            'chop_power': int(data[7]),
-            'carry_plum': int(data[8]),
-            'carry_lemon': int(data[9]),
-            'carry_apple': int(data[10]),
-            'carry_banana': int(data[11]),
-            'carry_iron': int(data[12]),
-            'carry_wood': int(data[13])
-        }
-        if troll['player'] == 0:
-            my_trolls.append(troll)
-        else:
-            opp_trolls.append(troll)
-
-    actions = []
-    num_trolls = len(my_trolls)
-    
-    # ENTRAÎNEMENT ULTRA-AGRESSIF - La clé de la victoire !
-    # Troll 2: Harvester (vitesse=2, capacité=3, récolte=2, coupe=0)
-    if num_trolls == 1 and can_afford_training(my_inventory, num_trolls, 2, 3, 2, 0):
-        actions.append("TRAIN 2 3 2 0")
-    # Troll 3: Chopper (vitesse=2, capacité=2, récolte=0, coupe=3)  
-    elif num_trolls == 2 and can_afford_training(my_inventory, num_trolls, 2, 2, 0, 3):
-        actions.append("TRAIN 2 2 0 3")
-    # Troll 4: Polyvalent (vitesse=2, capacité=2, récolte=1, coupe=2)
-    elif num_trolls == 3 and turn > 40 and can_afford_training(my_inventory, num_trolls, 2, 2, 1, 2):
-        actions.append("TRAIN 2 2 1 2")
-    # Trolls supplémentaires si ressources abondantes
-    elif num_trolls >= 4 and turn > 80 and turn % 50 == 0 and can_afford_training(my_inventory, num_trolls, 2, 2, 1, 1):
-        actions.append("TRAIN 2 2 1 1")
-
-    planted_this_turn = set()
-    occupied_positions = {(t['x'], t['y']) for t in my_trolls + opp_trolls}
-    
-    for troll in my_trolls:
-        total_carry = sum([
-            troll['carry_plum'], troll['carry_lemon'],
-            troll['carry_apple'], troll['carry_banana'],
-            troll['carry_wood'], troll['carry_iron']
-        ])
-
-        # Retour cabane si on porte quelque chose
-        if total_carry > 0:
-            if is_adjacent(troll['x'], troll['y'], my_shack[0], my_shack[1]):
-                actions.append(f"DROP {troll['id']}")
-            else:
-                actions.append(f"MOVE {troll['id']} {my_shack[0]} {my_shack[1]}")
-            continue
-
-        # RÔLES basés sur les attributs
-        if troll['chop_power'] >= 3:
-            role = 'chopper'
-        elif troll['harvest_power'] >= 2:
-            role = 'harvester'
-        elif troll['id'] == 0 and num_trolls <= 2:
-            role = 'bootstrap'  # Premier troll en phase de démarrage
-        else:
-            role = 'versatile'
-
-        # ═══════════════════════════════════════════════════════════
-        # BOOTSTRAP - Premier troll collecte ressources d'entraînement
-        # ═══════════════════════════════════════════════════════════
-        if role == 'bootstrap':
-            # Objectif: Collecter rapidement pour entraîner trolls 2 et 3
-            # Besoins troll 2 (2,3,2,0): 5 PLUM, 10 LEMON, 5 APPLE, 1 IRON
-            # Besoins troll 3 (2,2,0,3): 8 PLUM, 8 LEMON, 2 APPLE, 13 IRON
-            
-            # Phase 1: Obtenir fer (priorité absolue!)
-            if my_inventory[4] < 3 and iron_positions:
-                target = min(iron_positions, key=lambda p: manhattan_distance(troll['x'], troll['y'], p[0], p[1]))
-                if is_adjacent(troll['x'], troll['y'], target[0], target[1]):
-                    actions.append(f"MINE {troll['id']}")
-                else:
-                    actions.append(f"MOVE {troll['id']} {target[0]} {target[1]}")
+def main():
+    read = sys.stdin.readline
+    width, height = map(int, read().split())
+    my_shack = None
+    iron_list = []
+    for i in range(height):
+        row = read().rstrip()
+        for j, c in enumerate(row):
+            if c == '0': my_shack = (j, i)
+            elif c == '+': iron_list.append((j, i))
+    sx, sy = my_shack
+    MAX_HP = {
+        'PLUM':   [0, 6, 8, 10, 12],
+        'LEMON':  [0, 6, 8, 10, 12],
+        'APPLE':  [0, 11, 14, 17, 20],
+        'BANANA': [0, 3, 4, 5, 6],
+    }
+    def mdist(x1, y1, x2, y2): return abs(x1-x2)+abs(y1-y2)
+    def is_adj(x1, y1, x2, y2): return abs(x1-x2)+abs(y1-y2) == 1
+    def can_train(inv, n, m, c, h, ch):
+        return (inv[0] >= n+m*m and inv[1] >= n+c*c and
+                inv[2] >= n+h*h and inv[4] >= n+ch*ch)
+    turn = 0
+    while True:
+        turn += 1
+        my_inv = list(map(int, read().split()))
+        read()
+        tc = int(read())
+        trees = []; tree_at = {}
+        for _ in range(tc):
+            p = read().split()
+            t = {'type': p[0], 'x': int(p[1]), 'y': int(p[2]),
+                 'size': int(p[3]), 'health': int(p[4]),
+                 'fruits': int(p[5]), 'cooldown': int(p[6])}
+            trees.append(t); tree_at[(t['x'], t['y'])] = t
+        nc = int(read())
+        my_trolls = []
+        for _ in range(nc):
+            v = read().split()
+            if int(v[1]) == 0:
+                my_trolls.append({
+                    'id': int(v[0]), 'x': int(v[2]), 'y': int(v[3]),
+                    'spd': int(v[4]), 'cap': int(v[5]),
+                    'hp': int(v[6]), 'cp': int(v[7]),
+                    'cplum': int(v[8]), 'clem': int(v[9]),
+                    'capl': int(v[10]), 'cban': int(v[11]),
+                    'cirn': int(v[12]), 'cwod': int(v[13]),
+                })
+        n = len(my_trolls)
+        actions = []
+        # Training: best affordable build first
+        if n < 4 and turn < 260:
+            builds = ([(2,2,1,2),(1,2,1,2),(2,2,1,1),(1,2,1,1),
+                       (2,2,0,2),(1,2,0,2),(2,2,0,1),(1,2,0,1),
+                       (1,1,1,1),(1,1,0,1)] if iron_list else
+                      [(2,2,2,0),(1,2,2,0),(2,2,1,0),(1,2,1,0),(1,1,1,0)])
+            for m, c, h, ch in builds:
+                if can_train(my_inv, n, m, c, h, ch):
+                    actions.append(f"TRAIN {m} {c} {h} {ch}")
+                    break
+        need_fruits = (n < 4 and
+                       not can_train(my_inv, n, 1, 2, 1, 0) and
+                       not (iron_list and can_train(my_inv, n, 1, 2, 0, 1)))
+        for troll in my_trolls:
+            tx, ty = troll['x'], troll['y']
+            total = (troll['cplum'] + troll['clem'] + troll['capl'] +
+                     troll['cban'] + troll['cirn'] + troll['cwod'])
+            free = troll['cap'] - total
+            tid = troll['id']
+            spd = max(1, troll['spd'])
+            cp = troll['cp']; hp = troll['hp']
+            adj_sh = is_adj(tx, ty, sx, sy)
+            # Endgame: return immediately
+            if turn >= 293 and total > 0:
+                actions.append(f"DROP {tid}" if adj_sh else f"MOVE {tid} {sx} {sy}")
                 continue
-            
-            # Phase 2: Collecter fruits manquants pour entraînement
-            needed_fruits = []
-            if my_inventory[0] < 8:  # PLUM
-                needed_fruits.append('PLUM')
-            if my_inventory[1] < 12:  # LEMON (besoin de 10 + marge)
-                needed_fruits.append('LEMON')
-            if my_inventory[2] < 6:  # APPLE
-                needed_fruits.append('APPLE')
-            if my_inventory[3] < 5:  # BANANA (pour planter plus tard)
-                needed_fruits.append('BANANA')
-            
-            if needed_fruits:
-                # Chercher arbres avec fruits nécessaires
-                target_trees = [t for t in trees if t['fruits'] > 0 and t['type'] in needed_fruits]
-                if target_trees:
-                    target = min(target_trees, key=lambda t: manhattan_distance(troll['x'], troll['y'], t['x'], t['y']))
-                    if (troll['x'], troll['y']) == (target['x'], target['y']):
-                        actions.append(f"HARVEST {troll['id']}")
-                    else:
-                        actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
+            # ONLY return when FULL (key fix!)
+            if free == 0:
+                actions.append(f"DROP {tid}" if adj_sh else f"MOVE {tid} {sx} {sy}")
+                continue
+            action = None
+            # Act on current cell tree
+            cur = tree_at.get((tx, ty))
+            if cur is not None and free > 0:
+                mh = MAX_HP.get(cur['type'], [0, 99, 99, 99, 99])
+                sz = min(cur['size'], 4)
+                is_damaged = sz > 0 and cur['health'] < mh[sz]
+                if cp > 0 and is_damaged:
+                    action = f"CHOP {tid}"
+                elif cur['fruits'] > 0 and hp > 0:
+                    action = (f"HARVEST {tid}" if (need_fruits or cp == 0)
+                              else f"CHOP {tid}")
+                elif cp > 0:
+                    action = f"CHOP {tid}"
+                if action:
+                    actions.append(action); continue
+            # Value-based target selection
+            best_v = -1.0; best_pos = None; best_kind = None
+            for t in trees:
+                d = mdist(tx, ty, t['x'], t['y'])
+                tt = (d + spd - 1) // spd if d > 0 else 0
+                if t['fruits'] > 0 and hp > 0 and free > 0:
+                    fg = min(t['fruits'], free, hp)
+                    v = (1.5 if need_fruits else 1.0) * fg / max(1, tt + 1)
+                    if v > best_v:
+                        best_v = v; best_pos = (t['x'], t['y']); best_kind = 'harvest'
+                if cp > 0 and free > 0:
+                    chops = max(1, (t['health'] + cp - 1) // cp)
+                    wood = min(t['size'], free)
+                    if wood > 0:
+                        v = (2.0 if need_fruits else 4.0) * wood / max(1, tt + chops)
+                        if v > best_v:
+                            best_v = v; best_pos = (t['x'], t['y']); best_kind = 'chop'
+            # Iron mining for training
+            if n < 4 and cp > 0 and free > 0:
+                iv = 10.0 if my_inv[4] < 5 else (4.0 if my_inv[4] < 20 else 0.0)
+                if iv > 0:
+                    for ix, iy in iron_list:
+                        d = mdist(tx, ty, ix, iy)
+                        if d == 0: continue
+                        ta = (d - 1 + spd - 1) // spd if d > 1 else 0
+                        v = iv / max(1, ta + 1)
+                        if v > best_v:
+                            best_v = v; best_pos = (ix, iy); best_kind = 'mine'
+            if best_pos is not None:
+                bx, by = best_pos
+                if best_kind == 'mine':
+                    action = (f"MINE {tid}" if is_adj(tx, ty, bx, by)
+                              else f"MOVE {tid} {bx} {by}")
+                elif (tx, ty) == (bx, by):
+                    t2 = tree_at.get((bx, by))
+                    if t2 is not None:
+                        if best_kind == 'chop' and cp > 0:
+                            action = f"CHOP {tid}"
+                        elif t2['fruits'] > 0 and hp > 0:
+                            action = f"HARVEST {tid}"
                 else:
-                    # Récolter n'importe quel fruit disponible
-                    any_fruit_trees = [t for t in trees if t['fruits'] > 0]
-                    if any_fruit_trees:
-                        target = min(any_fruit_trees, key=lambda t: manhattan_distance(troll['x'], troll['y'], t['x'], t['y']))
-                        if (troll['x'], troll['y']) == (target['x'], target['y']):
-                            actions.append(f"HARVEST {troll['id']}")
-                        else:
-                            actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
-                    else:
-                        actions.append("WAIT")
-            else:
-                # Compléter le fer si nécessaire
-                if my_inventory[4] < 15 and iron_positions:
-                    target = min(iron_positions, key=lambda p: manhattan_distance(troll['x'], troll['y'], p[0], p[1]))
-                    if is_adjacent(troll['x'], troll['y'], target[0], target[1]):
-                        actions.append(f"MINE {troll['id']}")
-                    else:
-                        actions.append(f"MOVE {troll['id']} {target[0]} {target[1]}")
-                else:
-                    actions.append("WAIT")
+                    action = f"MOVE {tid} {bx} {by}"
+            elif total > 0:
+                action = f"DROP {tid}" if adj_sh else f"MOVE {tid} {sx} {sy}"
+            if action:
+                actions.append(action)
+        sys.stdout.write((';'.join(actions) if actions else "WAIT") + '\n')
+        sys.stdout.flush()
 
-        # ═══════════════════════════════════════════════════════════
-        # CHOPPER - BOIS = 4 POINTS !!! PRIORITÉ MAXIMALE
-        # ═══════════════════════════════════════════════════════════
-        elif role == 'chopper':
-            # 1. Couper arbres taille 4 (4 bois = 16 points!)
-            size4_trees = [t for t in trees if t['size'] == 4]
-            if size4_trees:
-                # Priorité BANANA près eau (repoussent vite)
-                banana_water = [t for t in size4_trees if t['type'] == 'BANANA' and is_near_water(t['x'], t['y'])]
-                target = min(banana_water if banana_water else size4_trees,
-                           key=lambda t: manhattan_distance(troll['x'], troll['y'], t['x'], t['y']))
-                
-                if (troll['x'], troll['y']) == (target['x'], target['y']):
-                    actions.append(f"CHOP {troll['id']}")
-                else:
-                    actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
-            
-            # 2. Couper arbres taille 3 (3 bois = 12 points)
-            elif [t for t in trees if t['size'] == 3]:
-                size3_trees = [t for t in trees if t['size'] == 3]
-                target = min(size3_trees, key=lambda t: manhattan_distance(troll['x'], troll['y'], t['x'], t['y']))
-                if (troll['x'], troll['y']) == (target['x'], target['y']):
-                    actions.append(f"CHOP {troll['id']}")
-                else:
-                    actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
-            
-            # 3. Planter BANANA si on en porte
-            elif troll['carry_banana'] > 0:
-                spots = []
-                for y in range(height):
-                    for x in range(width):
-                        if (grid[y][x] == '.' and is_near_water(x, y) and
-                            (x, y) not in tree_positions and (x, y) not in planted_this_turn and
-                            (x, y) not in occupied_positions):
-                            spots.append((x, y))
-                
-                if spots:
-                    target = min(spots, key=lambda p: manhattan_distance(troll['x'], troll['y'], p[0], p[1]))
-                    if (troll['x'], troll['y']) == target:
-                        actions.append(f"PLANT {troll['id']} BANANA")
-                        planted_this_turn.add(target)
-                        tree_positions.add(target)
-                    else:
-                        actions.append(f"MOVE {troll['id']} {target[0]} {target[1]}")
-                else:
-                    actions.append("WAIT")
-            
-            # 4. Récolter BANANA pour planter
-            else:
-                banana_trees = [t for t in trees if t['type'] == 'BANANA' and t['fruits'] > 0]
-                if banana_trees:
-                    target = min(banana_trees, key=lambda t: manhattan_distance(troll['x'], troll['y'], t['x'], t['y']))
-                    if (troll['x'], troll['y']) == (target['x'], target['y']):
-                        actions.append(f"HARVEST {troll['id']}")
-                    else:
-                        actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
-                # 5. Couper n'importe quel arbre
-                elif trees:
-                    target = min(trees, key=lambda t: (-t['size'], manhattan_distance(troll['x'], troll['y'], t['x'], t['y'])))
-                    if (troll['x'], troll['y']) == (target['x'], target['y']):
-                        actions.append(f"CHOP {troll['id']}")
-                    else:
-                        actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
-                else:
-                    actions.append("WAIT")
-
-        # ═══════════════════════════════════════════════════════════
-        # HARVESTER - Collecter fruits efficacement
-        # ═══════════════════════════════════════════════════════════
-        elif role == 'harvester':
-            trees_with_fruits = [t for t in trees if t['fruits'] > 0]
-            if trees_with_fruits:
-                # Priorité fruits pour entraînement
-                needed = []
-                if my_inventory[0] < 20: needed.append('PLUM')
-                if my_inventory[1] < 20: needed.append('LEMON')
-                if my_inventory[2] < 15: needed.append('APPLE')
-                if my_inventory[3] < 15: needed.append('BANANA')
-                
-                priority = [t for t in trees_with_fruits if t['type'] in needed]
-                target = min(priority if priority else trees_with_fruits,
-                           key=lambda t: manhattan_distance(troll['x'], troll['y'], t['x'], t['y']))
-                
-                if (troll['x'], troll['y']) == (target['x'], target['y']):
-                    actions.append(f"HARVEST {troll['id']}")
-                else:
-                    actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
-            
-            # Planter BANANA si on en porte
-            elif troll['carry_banana'] > 0:
-                spots = []
-                for y in range(height):
-                    for x in range(width):
-                        if (grid[y][x] == '.' and is_near_water(x, y) and
-                            (x, y) not in tree_positions and (x, y) not in planted_this_turn and
-                            (x, y) not in occupied_positions):
-                            spots.append((x, y))
-                
-                if spots:
-                    target = min(spots, key=lambda p: manhattan_distance(troll['x'], troll['y'], p[0], p[1]))
-                    if (troll['x'], troll['y']) == target:
-                        actions.append(f"PLANT {troll['id']} BANANA")
-                        planted_this_turn.add(target)
-                        tree_positions.add(target)
-                    else:
-                        actions.append(f"MOVE {troll['id']} {target[0]} {target[1]}")
-                else:
-                    actions.append("WAIT")
-            else:
-                actions.append("WAIT")
-
-        # ═══════════════════════════════════════════════════════════
-        # VERSATILE - S'adapter aux besoins
-        # ═══════════════════════════════════════════════════════════
-        else:
-            # 1. Récolter fruits d'abord
-            trees_with_fruits = [t for t in trees if t['fruits'] > 0]
-            if trees_with_fruits:
-                target = min(trees_with_fruits, key=lambda t: manhattan_distance(troll['x'], troll['y'], t['x'], t['y']))
-                if (troll['x'], troll['y']) == (target['x'], target['y']):
-                    actions.append(f"HARVEST {troll['id']}")
-                else:
-                    actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
-            
-            # 2. Couper arbres matures pour bois
-            elif [t for t in trees if t['size'] >= 3]:
-                mature = [t for t in trees if t['size'] >= 3]
-                target = min(mature, key=lambda t: (-t['size'], manhattan_distance(troll['x'], troll['y'], t['x'], t['y'])))
-                if (troll['x'], troll['y']) == (target['x'], target['y']):
-                    actions.append(f"CHOP {troll['id']}")
-                else:
-                    actions.append(f"MOVE {troll['id']} {target['x']} {target['y']}")
-            
-            # 3. Miner fer si besoin
-            elif my_inventory[4] < 20 and iron_positions:
-                target = min(iron_positions, key=lambda p: manhattan_distance(troll['x'], troll['y'], p[0], p[1]))
-                if is_adjacent(troll['x'], troll['y'], target[0], target[1]):
-                    actions.append(f"MINE {troll['id']}")
-                else:
-                    actions.append(f"MOVE {troll['id']} {target[0]} {target[1]}")
-            
-            # 4. Planter BANANA si on en a
-            elif troll['carry_banana'] > 0:
-                spots = []
-                for y in range(height):
-                    for x in range(width):
-                        if (grid[y][x] == '.' and is_near_water(x, y) and
-                            (x, y) not in tree_positions and (x, y) not in planted_this_turn and
-                            (x, y) not in occupied_positions):
-                            spots.append((x, y))
-                
-                if spots:
-                    target = min(spots, key=lambda p: manhattan_distance(troll['x'], troll['y'], p[0], p[1]))
-                    if (troll['x'], troll['y']) == target:
-                        actions.append(f"PLANT {troll['id']} BANANA")
-                        planted_this_turn.add(target)
-                        tree_positions.add(target)
-                    else:
-                        actions.append(f"MOVE {troll['id']} {target[0]} {target[1]}")
-                else:
-                    actions.append("WAIT")
-            else:
-                actions.append("WAIT")
-
-    print(';'.join(actions) if actions else "WAIT")
+main()
 ```
 
