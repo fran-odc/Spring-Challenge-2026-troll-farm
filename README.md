@@ -36,6 +36,10 @@ Control your troll pack and gather as many resources as possible before the game
 - Added economic expansion logic with adaptive troll training based on available resources and game progression.
 - Implemented early-game planting strategy to increase long-term fruit production before switching to full harvesting mode.
 
+**League Bronze to League Silver:**
+- Introduced value-based target scoring to prioritize the most profitable actions per turn.
+- Added multi-troll coordination with target deduplication, resource-aware training logic, and specialized late-game decision handling.
+
 ## 🛠️ Tech Stack
 
 Python 3.11
@@ -85,6 +89,21 @@ Python 3.11
 - Successfully climbed from Wood 1 to Bronze league
 - Validated that early planting improved long-term resource generation in extended matches
 
+**League Bronze to League Silver:**
+
+**Development workflow:**
+- Incrementally added chopping and mining behaviors
+- Tuned action scoring and resource priorities based on match outcomes
+
+**Testing:**
+- Verified multi-troll coordination and target assignment logic
+- Validated late-game return behavior
+
+**Validation:**
+- Successfully climbed from Bronze league to Silver league
+- Confirmed improved resource efficiency and reduced troll idle time
+
+
 ## ⚖️ Design Trade-offs
 
 **League Wood 2 to League Wood 1:**
@@ -98,7 +117,11 @@ Python 3.11
 **League Wood 1 to League Bronze:**
 - **Economic scaling over optimization**: Focused on increasing troll count and tree availability rather than perfect per-turn efficiency
 - **Heuristic planting strategy**: Triggered planting mode using simple thresholds instead of map-wide resource forecasting
-  
+
+**League Bronze to League Silver:**
+- **Controlled complexity**: Added strategic systems while keeping the code single-file and contest-safe
+- **Greedy coordination**: Trolls coordinate through target reservation rather than global optimization
+- **Resource specialization**: Dynamically shifts between fruits, wood, and iron depending on training needs
 
 <!-- ## 🏆 Competition Results
 
