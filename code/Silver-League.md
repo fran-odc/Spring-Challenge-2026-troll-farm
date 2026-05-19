@@ -1,8 +1,8 @@
-Code 526th (out of 859)
+Code 519th (out of 859)
 
 <!-- 
 ```
-  import sys
+import sys
 
 def main():
     read=sys.stdin.readline
