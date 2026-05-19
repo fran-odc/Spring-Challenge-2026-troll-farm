@@ -18,6 +18,8 @@ Control your troll pack and gather as many resources as possible before the game
 
 ## 🧠 Solution Approach
 
+- Iterative improvement using insights from Claude Sonnet 4.6 and Lumo 1.3.
+
 🪵 **League Wood 2 to League Wood 1:**
 - Started from the default starter bot and progressively improved decision-making logic.
 - Used iterative testing with Claude to refine troll behavior (harvest).
