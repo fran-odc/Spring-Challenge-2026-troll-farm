@@ -1,4 +1,4 @@
-Code 22th (out of 485)
+Code 22nd (out of 485)
 <!-- 
 ```
 import sys
