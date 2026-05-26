@@ -6,7 +6,7 @@
 [![GitHub branch protection](https://img.shields.io/badge/Branch_Protected-main-green.svg)](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches)
 
 ![🐍 Challenge](images/example-game.png)
-* [Screenshot from here](https://www.youtube.com/watch?v=cBDjsuNzLQ0) *
+* Screenshot from [here](https://www.youtube.com/watch?v=cBDjsuNzLQ0) *
 
 ## 🎯 Goal
 
