@@ -17,9 +17,9 @@ Grid-based map with:
   - 🍌 BANANA
 
 - Trees have their own time for:
-✅ growing ⏳
-✅ producing fruits 🍓
-✅ growing faster near water 🌊
+  - ✅ growing ⏳
+  - ✅ producing fruits 🍓
+  - ✅ growing faster near water 🌊
 
 
 # 👹 Trolls & Training
