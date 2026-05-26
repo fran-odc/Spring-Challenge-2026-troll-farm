@@ -1,6 +1,3 @@
-Code 62th (out of 721)
-
-<!-- 
 ```
 import sys
 
@@ -889,4 +886,3 @@ def main():
 main()
 
 ```
--->
