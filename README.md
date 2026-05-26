@@ -15,7 +15,7 @@ Control a tribe of trolls and score more points than your opponent by collecting
 
 [📂 Official Contest Website](https://www.codingame.com/contests/spring-challenge-2026-troll-farm) 
 
-<!-- [📂 Game Rules](docs/Game-Rules.md?plain=1) -->
+[📂 Game Rules](docs/Game-Rules.md?plain=1)
 
 
 ## 🧠 Solution Approach
