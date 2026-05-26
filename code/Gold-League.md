@@ -1,3 +1,5 @@
+Code: top 25% (out of 2,022 final players)
+
 ```
 import sys
 
