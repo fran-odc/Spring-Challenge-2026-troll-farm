@@ -7,7 +7,7 @@
 
 ![🐍 Challenge](images/example-game.png)
 
-* Screenshot from [here](https://www.youtube.com/watch?v=cBDjsuNzLQ0) *
+*Screenshot from [here](https://www.youtube.com/watch?v=cBDjsuNzLQ0)*
 
 ## 🎯 Goal
 
