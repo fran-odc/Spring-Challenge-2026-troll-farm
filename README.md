@@ -9,7 +9,7 @@
 
 ## 🎯 Goal
 
-Control your troll pack and gather as many resources as possible before the game ends.
+Control a tribe of trolls and score more points than your opponent by collecting resources.
 
 [📂 Official Contest Website](https://www.codingame.com/contests/spring-challenge-2026-troll-farm) 
 
